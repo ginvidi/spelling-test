@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14161c" media="(prefers-color-scheme: dark)">
+  <meta name="referrer" content="no-referrer">
+  <title>Year 3 Spelling Test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <section class="card">
+      <h1>Year 3 Spelling Test</h1>
+      <p id="status" class="status" aria-live="polite">Press Start. Each word is read twice, in a random order.</p>
+      <div class="actions">
+        <button id="start" type="button">Start test</button>
+        <button id="stop" type="button" class="secondary">Stop</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Preset word lists</h2>
+      <p class="hint">Tick one or more weeks, choose the word types, then load them.</p>
+      <div id="weeks" class="chips"></div>
+      <div class="actions">
+        <button id="allWeeks" type="button" class="secondary small">All weeks</button>
+        <button id="noWeeks" type="button" class="secondary small">None</button>
+      </div>
+      <label class="inline"><input type="checkbox" id="typeSpelling" checked> Spelling words</label>
+      <label class="inline"><input type="checkbox" id="typeException" checked> Common exception words</label>
+      <div class="actions">
+        <button id="load" type="button">Load (replace)</button>
+        <button id="add" type="button" class="secondary">Add to my list</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Your words</h2>
+      <label class="field">One word per line (or separate with commas)
+        <textarea id="words" rows="10" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+      </label>
+      <button id="clear" type="button" class="secondary">Clear list</button>
+    </section>
+
+    <section class="card">
+      <h2>Settings</h2>
+      <label class="field">How many words to test (leave empty for all)
+        <input id="count" type="number" inputmode="numeric" min="1" placeholder="All words in the list">
+      </label>
+      <label class="field">Gap between words (seconds)
+        <input id="gap" type="number" inputmode="numeric" min="1" value="7">
+      </label>
+      <label class="field">Voice
+        <select id="voice"></select>
+      </label>
+      <button id="testVoice" type="button" class="secondary small">Try this voice</button>
+      <p id="voiceNote" class="note" hidden>Couldn't reach the Google voice (are you online?). Using this device's voice instead.</p>
+      <details class="tip">
+        <summary>About the voices</summary>
+        <p>The <strong>Google British voice</strong> sounds the same on every phone, tablet and computer. It needs an internet connection. It's the free voice from Google Translate, so Google could change or block it at any time.</p>
+        <p>If it can't be reached, the page uses this device's own voice so the test carries on. You can also pick a device voice from the list to use offline.</p>
+      </details>
+      <label class="field">Speed
+        <select id="rate">
+          <option value="0.7">Slow</option>
+          <option value="0.85" selected>Normal (clear)</option>
+          <option value="1">Fast</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="card" id="answerCard" hidden>
+      <h2>Answer key (this run's order)</h2>
+      <ol id="answers"></ol>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
