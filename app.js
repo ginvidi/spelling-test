@@ -7,39 +7,75 @@ const DEFAULT_WORDS = [
   "enclosure", "closure", "disclosure", "composure",
 ];
 
-const WEEKS = [
+// Weeks not listed yet show up on the page as disabled chips.
+const TERMS = [
   {
-    name: "Week 1 (test 14/09)",
-    spelling: "mouth, sprout, around, sound, spout, ouch, hound, trout, found, proud",
-    exception: "after, again, because, first, house",
+    name: "Autumn term",
+    halves: [
+      {
+        name: "Autumn 1",
+        weeks: [
+          {
+            name: "Week 1 (test 14/09)",
+            spelling: "mouth, sprout, around, sound, spout, ouch, hound, trout, found, proud",
+            exception: "after, again, because, first, house",
+          },
+          {
+            name: "Week 2 (test 21/09)",
+            spelling: "touch, double, country, trouble, young, cousin, enough, couple, encourage, flourish",
+            exception: "laugh, little, night, there, their",
+          },
+          {
+            name: "Week 3 (test 28/09)",
+            spelling: "symbol, gym, myth, synonym, Egypt, lyrics, pyramid, system, mystery, gymnastics",
+            exception: "these, three, water, where, would",
+          },
+          {
+            name: "Week 4 (test 05/10)",
+            spelling: "treasure, measure, leisure, pleasure, pressure, exposure, enclosure, closure, disclosure, composure",
+            exception: "because, laugh, where, house, little",
+          },
+          {
+            name: "Week 5 (test 12/10)",
+            spelling: "adventure, future, picture, nature, creature, furniture, capture, sculpture, fracture, mixture",
+            exception: "again, there, these, would, night",
+          },
+          {
+            name: "Week 6 (test 19/10)",
+            spelling: "actual, bicycle, answer, circle, earth, enough, island, fruit, often, popular",
+            exception: "first, their, water, three, after",
+          },
+        ],
+      },
+      {
+        name: "Autumn 2",
+        weeks: [
+          {
+            name: "Week 1",
+            spelling: "reaction, reappear, rebound, redecorate, redo, refresh, replay, return, revenge, review",
+            exception: "",
+          },
+        ],
+      },
+    ],
   },
   {
-    name: "Week 2 (test 21/09)",
-    spelling: "touch, double, country, trouble, young, cousin, enough, couple, encourage, flourish",
-    exception: "laugh, little, night, there, their",
+    name: "Spring term",
+    halves: [
+      { name: "Spring 1", weeks: [] },
+      { name: "Spring 2", weeks: [] },
+    ],
   },
   {
-    name: "Week 3 (test 28/09)",
-    spelling: "symbol, gym, myth, synonym, Egypt, lyrics, pyramid, system, mystery, gymnastics",
-    exception: "these, three, water, where, would",
-  },
-  {
-    name: "Week 4 (test 05/10)",
-    spelling: "treasure, measure, leisure, pleasure, pressure, exposure, enclosure, closure, disclosure, composure",
-    exception: "because, laugh, where, house, little",
-  },
-  {
-    name: "Week 5 (test 12/10)",
-    spelling: "adventure, future, picture, nature, creature, furniture, capture, sculpture, fracture, mixture",
-    exception: "again, there, these, would, night",
-  },
-  {
-    name: "Week 6 (test 19/10)",
-    spelling: "actual, bicycle, answer, circle, earth, enough, island, fruit, often, popular",
-    exception: "first, their, water, three, after",
+    name: "Summer term",
+    halves: [
+      { name: "Summer 1", weeks: [] },
+      { name: "Summer 2", weeks: [] },
+    ],
   },
 ];
 
+const WEEKS_PER_HALF = 6;
 const STORAGE_KEY = "spelling_words";
 const MIN_GAP_SECONDS = 1;
 const DEFAULT_GAP_SECONDS = 7;
@@ -104,26 +140,74 @@ function restoreWords() {
 
 // ---------- Preset weeks ----------
 
+function makeAccordion(title, open) {
+  const details = document.createElement("details");
+  details.className = "accordion";
+  details.open = open;
+
+  const summary = document.createElement("summary");
+  const name = document.createElement("span");
+  name.textContent = title;
+  const count = document.createElement("span");
+  count.className = "count";
+  summary.append(name, count);
+
+  details.appendChild(summary);
+  return details;
+}
+
+function makeWeekChip(week, value, number) {
+  const label = document.createElement("label");
+  label.title = week ? week.name : "No words yet";
+
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.value = value;
+  input.disabled = !week;
+
+  const span = document.createElement("span");
+  span.textContent = `Week ${number}`;
+
+  label.append(input, span);
+  return label;
+}
+
+// The newest half term with words starts open.
+function latestHalf() {
+  return TERMS.flatMap((term) => term.halves).filter((half) => half.weeks.length).pop();
+}
+
 function renderWeeks() {
   const container = $("weeks");
-  WEEKS.forEach((week, i) => {
-    const label = document.createElement("label");
-    label.title = week.name;
+  const latest = latestHalf();
+  TERMS.forEach((term, t) => {
+    const termBox = makeAccordion(term.name, term.halves.includes(latest));
+    term.halves.forEach((half, h) => {
+      const halfBox = makeAccordion(half.name, half === latest);
+      const chips = document.createElement("div");
+      chips.className = "chips";
+      const total = Math.max(WEEKS_PER_HALF, half.weeks.length);
+      for (let w = 0; w < total; w++) {
+        chips.appendChild(makeWeekChip(half.weeks[w], `${t}.${h}.${w}`, w + 1));
+      }
+      halfBox.appendChild(chips);
+      termBox.appendChild(halfBox);
+    });
+    container.appendChild(termBox);
+  });
+}
 
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.value = String(i);
-
-    const span = document.createElement("span");
-    span.textContent = `Week ${i + 1}`;
-
-    label.append(input, span);
-    container.appendChild(label);
+// Ticks stay active when an accordion is closed, so each heading shows its count.
+function updateWeekCounts() {
+  document.querySelectorAll("#weeks details").forEach((box) => {
+    const n = box.querySelectorAll("input:checked").length;
+    box.querySelector(":scope > summary .count").textContent = n ? `${n} ticked` : "";
   });
 }
 
 function setAllWeeks(checked) {
-  document.querySelectorAll("#weeks input").forEach((c) => { c.checked = checked; });
+  document.querySelectorAll("#weeks input:not(:disabled)").forEach((c) => { c.checked = checked; });
+  updateWeekCounts();
 }
 
 function pickedWords() {
@@ -131,7 +215,8 @@ function pickedWords() {
   const useException = $("typeException").checked;
   const out = [];
   document.querySelectorAll("#weeks input:checked").forEach((c) => {
-    const week = WEEKS[Number(c.value)];
+    const [t, h, w] = c.value.split(".").map(Number);
+    const week = TERMS[t].halves[h].weeks[w];
     if (useSpelling) uniqueAppend(out, splitList(week.spelling));
     if (useException) uniqueAppend(out, splitList(week.exception));
   });
@@ -332,7 +417,7 @@ function init() {
   $("load").addEventListener("click", () => {
     const words = pickedWords();
     if (!words.length) {
-      setStatus("Tick at least one week and one word type.");
+      setStatus("No words to load. Tick a week and a word type it has words for.");
       return;
     }
     setWords(words);
@@ -342,6 +427,7 @@ function init() {
     setWords(uniqueAppend(getWords(), pickedWords()));
   });
 
+  $("weeks").addEventListener("change", updateWeekCounts);
   $("allWeeks").addEventListener("click", () => setAllWeeks(true));
   $("noWeeks").addEventListener("click", () => setAllWeeks(false));
   $("clear").addEventListener("click", () => setWords([]));

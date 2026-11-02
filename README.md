@@ -24,7 +24,8 @@ The in-app preview in the Claude desktop app doesn't load `styles.css` and `app.
 ## How to use it
 
 1. **Choose the words:**
-   - Tick one or more weeks under **Preset word lists**.
+   - Under **Preset word lists**, open a term and a half term, such as **Autumn term** then **Autumn 2**.
+   - Tick one or more weeks. You can tick weeks across different terms. Each heading shows how many weeks are ticked inside it, even when it's closed. Greyed-out weeks don't have words yet.
    - Choose **Spelling words**, **Common exception words** or both.
    - Press **Load (replace)** to replace the list, or **Add to my list** to add to it.
    - You can also type your own words in **Your words**, one per line or separated by commas. The list is saved in the browser.
@@ -45,14 +46,16 @@ The page uses the **Google British voice** unless you pick another one. It's the
 
 ## Adding a new week
 
-Open `app.js` and add an entry to the `WEEKS` list:
+Open `app.js`, find the half term in the `TERMS` list and add an entry to its `weeks` list:
 
 ```js
 {
-  name: "Week 7 (test 26/10)",
+  name: "Week 2 (test 09/11)",
   spelling: "word1, word2, word3",
   exception: "word4, word5",
 },
 ```
 
-A **Week 7** chip appears on the page automatically.
+Weeks are numbered by their place in the list. The chip for that week is enabled automatically. If the week has no exception words, use `exception: ""`.
+
+Each half term shows 6 weeks. If you add a 7th, an extra chip appears.
